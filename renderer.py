@@ -3,6 +3,7 @@ import sklearn.metrics
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import traceback
 
 np.set_printoptions(formatter={'float_kind': lambda x: "%.4f" % x})
 
@@ -24,8 +25,12 @@ def warpImg(img, t_height, t_width, prj, idx):
     new_img = np.zeros((t_height*t_width, 3))
     ## In case we have some points
     if prj.size != 0:
-        pixels = cv2.remap(img, np.squeeze(np.asarray(prj[0, :])).astype('float32'),
-                           np.squeeze(np.asarray(prj[1, :])).astype('float32'),  cv2.INTER_CUBIC)
+        prj0_as_float = np.squeeze(np.asarray(prj[0, :])).astype('float32')
+        prj1_as_float = np.squeeze(np.asarray(prj[1, :])).astype('float32')
+        try:
+            pixels = cv2.remap(img, prj0_as_float, prj1_as_float,  cv2.INTER_CUBIC)
+        except Exception as ex:
+            traceback.print_exc()
         pixels = pixels[:, 0, :]
         new_img[idx, :] = pixels
     else:
