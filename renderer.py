@@ -23,7 +23,8 @@ def badIndex(project, img):
 
 def warpImg(img, t_height, t_width, prj, idx):
     new_img = np.zeros((t_height*t_width, 3))
-    ## In case we have some points
+
+    # In case we have some points
     if prj.size != 0:
         prj0_as_float = np.squeeze(np.asarray(prj[0, :])).astype('float32')
         prj1_as_float = np.squeeze(np.asarray(prj[1, :])).astype('float32')
@@ -113,8 +114,8 @@ def render(img, proj_matrix, ref_U, eyemask, facemask, opts):
     ind_frontal = ind_all[nonbadind]
     #  ############# END INSIDE ##################################################
     # To do all at once
-    prj_jnt = np.hstack( (out_proj, in_proj ) )
-    ind_jnt = np.hstack( (ind_outside, ind_frontal) )
+    prj_jnt = np.hstack([out_proj, in_proj])
+    ind_jnt = np.hstack([ind_outside, ind_frontal])
 
     if opts.getboolean('renderer', 'background'):
         frontal_raw = warpImg(img, ref_U.shape[0], ref_U.shape[1], prj_jnt, ind_jnt)
