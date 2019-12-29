@@ -2,6 +2,8 @@ __author__ = 'Douglas'
 
 import urllib.request, urllib.error, urllib.parse, os, bz2
 dlib_facial_landmark_model_url = "http://ufpr.dl.sourceforge.net/project/dclib/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2"
+import os
+
 
 def download_file(url, dest):
     file_name = url.split('/')[-1]
@@ -37,10 +39,10 @@ def extract_bz2(fpath):
 
 
 def check_dlib_landmark_weights():
-    dlib_models_folder = "dlib_models"
-    if(not os.path.isdir(dlib_models_folder)):
-        os.mkdir(dlib_models_folder)
-    if(not os.path.isfile(dlib_models_folder+"/shape_predictor_68_face_landmarks.dat")):
-        if(not os.path.isfile(dlib_models_folder+"/shape_predictor_68_face_landmarks.dat.bz2")):
-            download_file(dlib_facial_landmark_model_url, dlib_models_folder)
-        extract_bz2(dlib_models_folder+"/shape_predictor_68_face_landmarks.dat.bz2")
+    dlib_models_folder = r"C:\Noam\Code\vision_course\shape_predictor"
+    assert os.path.isdir(dlib_models_folder)
+    predictor_file_path = os.path.join(dlib_models_folder, r"shape_predictor_68_face_landmarks.dat")
+    assert os.path.isfile(predictor_file_path)
+    # if not os.path.isfile(dlib_models_folder+"/shape_predictor_68_face_landmarks.dat.bz2"):
+    #     download_file(dlib_facial_landmark_model_url, dlib_models_folder)
+    # extract_bz2(dlib_models_folder+"/shape_predictor_68_face_landmarks.dat.bz2")
