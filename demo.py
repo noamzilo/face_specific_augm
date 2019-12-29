@@ -60,7 +60,7 @@ def demo():
             lmarks=[]
             lmarks.append(lmark)
         else:
-            print '> Detecting landmarks'
+            print('> Detecting landmarks')
             lmarks = feature_detection.get_landmarks(img, this_path)
 
         if len(lmarks) != 0:
@@ -72,13 +72,13 @@ def demo():
             listPose = myutil.decidePose(yaw,opts, newModels)
             ## Looping over the poses
             for poseId in listPose:
-            	posee = pose_models[poseId]
+                posee = pose_models[poseId]
                 ## Looping over the subjects
                 for subj in range(1,nSub+1):
                     pose =   posee + '_' + str(subj).zfill(2) +'.mat'
-                    print '> Looking at file: ' + image_path + ' with ' + pose
+                    print('> Looking at file: ' + image_path + ' with ' + pose)
                     # load detections performed by dlib library on 3D model and Reference Image
-                    print "> Using pose model in " + pose
+                    print("> Using pose model in " + pose)
                     ## Indexing the right model instead of loading it each time from memory.
                     model3D = allModels[pose]
                     eyemask = model3D.eyemask
@@ -111,7 +111,7 @@ def demo():
                         myutil.show(img_display, img, lmarks, rendered_raw, \
                         face_proj, background_proj, temp_proj2_out_2, sym_weight)
         else:
-            print '> Landmark not detected for this image...'  
+            print('> Landmark not detected for this image...')  
 
 if __name__ == "__main__":
     demo()

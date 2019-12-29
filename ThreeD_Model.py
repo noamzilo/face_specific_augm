@@ -43,7 +43,7 @@ class FaceModel:
             plt.imshow(output)
             plt.draw()
             plt.pause(0.001)
-            enter = raw_input("Press [enter] to continue.")
+            enter = input("Press [enter] to continue.")
 
         output[output==255]=1
         return output

@@ -26,7 +26,7 @@ def warpImg(img, t_height, t_width, prj, idx):
         pixels = pixels[:,0,:]
         new_img[idx,:] = pixels
     else:
-        print '> Projected points empty'
+        print('> Projected points empty')
     new_img = new_img.reshape(( t_height, t_width, 3), order='F')
     new_img[new_img > 255] = 255
     new_img[new_img < 0] = 0
@@ -67,7 +67,7 @@ def HandleBackground(out_proj,face_proj_in, img, opts):
 
 
 def render(img, proj_matrix, ref_U, eyemask, facemask, opts):
-	print "> Query image shape:", img.shape
+	print("> Query image shape:", img.shape)
 	img = img.astype('float32')
 
 	### Projecting 3D model onto the the image
@@ -162,7 +162,7 @@ def mysoftSymmetry(img, frontal_raw, ref_U, in_proj, \
         frontal_sym = frontal_sym.astype('uint8')
         weights = synth_frontal_acc[:,:,0]
     else: # both sides are occluded pretty much to the same extent -- do not use symmetry
-        print '> skipping sym'
+        print('> skipping sym')
         frontal_sym = frontal_raw
     return frontal_sym, weights
 
