@@ -26,20 +26,23 @@ def warpImg(img, t_height, t_width, prj, idx):
 
     # In case we have some points
     if prj.size != 0:
-        prj0_as_float = np.squeeze(np.asarray(prj[0, :])).astype('float32')
-        prj1_as_float = np.squeeze(np.asarray(prj[1, :])).astype('float32')
-        try:
-            pixels = cv2.remap(img, prj0_as_float, prj1_as_float,  cv2.INTER_CUBIC)
-        except Exception as ex:
-            traceback.print_exc()
-        pixels = pixels[:, 0, :]
+        map_x = np.squeeze(np.asarray(prj[0, :])).astype('float32')
+        map_x = map_x.reshape(t_height, t_width)
+        map_y = np.squeeze(np.asarray(prj[0, :])).astype('float32')
+        map_y = map_y.reshape(t_height, t_width)
+
+        pixels = cv2.remap(img, map_x, map_y, cv2.INTER_CUBIC)
+
+        pixels = pixels.reshape(-1, 3)
         new_img[idx, :] = pixels
     else:
         print('> Projected points empty')
-    new_img = new_img.reshape(( t_height, t_width, 3), order='F')
+    new_img = new_img.reshape((t_height, t_width, 3), order='F')
     new_img[new_img > 255] = 255
     new_img[new_img < 0] = 0
     new_img = new_img.astype('uint8')
+    cv2.imshow("111", new_img)
+    cv2.waitKey(0)
     return new_img
 
 
@@ -148,7 +151,7 @@ def mysoftSymmetry(img, frontal_raw, ref_U, in_proj, \
         synth_frontal_acc = cv2.GaussianBlur(synth_frontal_acc, (ksize_acc, ksize_acc), 30., borderType=cv2.BORDER_REPLICATE)
 
         # Checking which side has more occlusions?
-        midcolumn = np.round(ref_U.shape[1]/2)
+        midcolumn = int(np.round(ref_U.shape[1]/2))
         # apply soft symmetry to use whatever parts are visible in ocluded side
         synth_frontal_acc = synth_frontal_acc.reshape(-1, order='F')
         minacc=synth_frontal_acc[facemask].min()
