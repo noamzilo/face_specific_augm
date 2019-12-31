@@ -21,9 +21,13 @@ def warpImg(img, t_height, t_width, prj, idx):
     new_img = np.zeros((t_height*t_width, 3))
     ## In case we have some points
     if prj.size != 0:
-        pixels = cv2.remap(img, np.squeeze( np.asarray( prj[0,:] ) ).astype('float32'),\
-         np.squeeze( np.asarray( prj[1,:] ) ).astype('float32'),  cv2.INTER_CUBIC)
-        pixels = pixels[:,0,:]
+        map_x = np.squeeze( np.asarray( prj[0,:] ) ).astype('float32')
+        map_x = map_x.reshape(t_height, t_width)
+        map_y = np.squeeze( np.asarray( prj[1,:] ) ).astype('float32')
+        map_y = map_y.reshape(t_height, t_width)
+        pixels = cv2.remap(img, map_x, map_y, cv2.INTER_CUBIC)
+        # pixels = pixels[:,0,:]
+        pixels = pixels.reshape(-1, 3)
         new_img[idx,:] = pixels
     else:
         print('> Projected points empty')
