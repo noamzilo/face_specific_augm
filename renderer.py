@@ -139,7 +139,7 @@ def mysoftSymmetry(img, frontal_raw, ref_U, in_proj, \
         synth_frontal_acc = synth_frontal_acc.reshape((ref_U.shape[0], ref_U.shape[1]), order='F')
         synth_frontal_acc = cv2.GaussianBlur(synth_frontal_acc, (ksize_acc, ksize_acc), 30., borderType=cv2.BORDER_REPLICATE)
         ## Checking which side has more occlusions?
-        midcolumn = np.round(ref_U.shape[1]/2)
+        midcolumn = int(np.round(ref_U.shape[1]/2))
         # apply soft symmetry to use whatever parts are visible in ocluded side
         synth_frontal_acc = synth_frontal_acc.reshape(-1, order='F')
         minacc=synth_frontal_acc[facemask].min()
