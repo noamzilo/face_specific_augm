@@ -43,41 +43,57 @@ def preprocess_config():
         crop_models = [[23, 0, 23 + 125, 160], [0, 0, 210, 230], [0, 0, 210, 230]]  # <-- best crop for ResNet
 
 
-def create_paths():
-    path_to_images_folder = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\images"
-    image_paths = []
-    for file_path in os.listdir(path_to_images_folder):
-        if file_path.endswith(".png"):
-            image_paths.append(os.path.join(path_to_images_folder, file_path))
-    print(f"#images: {len(image_paths)}")
+def create_paths(ground_truth):
+    if ground_truth is None:
+        path_to_images_folder = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\images"
+        image_paths = []
+        for file_path in os.listdir(path_to_images_folder):
+            if file_path.endswith(".png"):
+                image_paths.append(os.path.join(path_to_images_folder, file_path))
+        print(f"#images: {len(image_paths)}")
 
-    points_paths = []
-    for file_path in os.listdir(path_to_images_folder):
-        if file_path.endswith(".pts"):
-            points_paths .append(os.path.join(path_to_images_folder, file_path))
-    print(f"#points: {len(points_paths )}")
+        points_paths = []
+        for file_path in os.listdir(path_to_images_folder):
+            if file_path.endswith(".pts"):
+                points_paths .append(os.path.join(path_to_images_folder, file_path))
+        print(f"#points: {len(points_paths )}")
 
-    # cull images that don't have points
-    images_paths_with_points = []
-    for image_path in image_paths:
-        for points_path in points_paths:
-            if image_path.split(".png")[0] == points_path.split(".pts")[0]:
-                images_paths_with_points.append(image_path)
-                break
-
-    # cull pointa that don't have images
-    points_paths_with_images = []
-    for points_path in points_paths:
+        # cull images that don't have points
+        images_paths_with_points = []
         for image_path in image_paths:
-            if image_path.split(".png")[0] != points_path.split(".pts")[0]:
-                points_paths_with_images.append(points_path)
-                break
+            for points_path in points_paths:
+                if image_path.split(".png")[0] == points_path.split(".pts")[0]:
+                    images_paths_with_points.append(image_path)
+                    break
 
-    assert len(images_paths_with_points) == len(points_paths_with_images)
-    print(f"#tagged images = {len(images_paths_with_points)}")
+        # cull points that don't have images
+        points_paths_with_images = []
+        for points_path in points_paths:
+            for image_path in image_paths:
+                if image_path.split(".png")[0] != points_path.split(".pts")[0]:
+                    points_paths_with_images.append(points_path)
+                    break
 
-    return sorted(images_paths_with_points), sorted(points_paths_with_images)
+        assert len(images_paths_with_points) == len(points_paths_with_images)
+        print(f"#tagged images = {len(images_paths_with_points)}")
 
+        return sorted(images_paths_with_points), sorted(points_paths_with_images)
+
+    else:
+        tagged_images_names = sorted(ground_truth['file name'])
+        path_to_images_folder = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\images"
+        image_paths = []
+        points_paths = []
+        for file_path in os.listdir(path_to_images_folder):
+            if file_path.endswith(".png") and file_path in tagged_images_names:
+                impath = os.path.join(path_to_images_folder, file_path)
+                ptspath = os.path.join(path_to_images_folder, file_path[:-4]+".pts")
+                if os.path.isfile(impath) and os.path.isfile(ptspath):
+                    image_paths.append(impath)
+                    points_paths.append(ptspath)
+        print(f"#images: {len(image_paths)}")
+
+        return sorted(image_paths), sorted(points_paths)
 
 def compare_ground_truth_to_results(images_paths, rvecs_per_image, ground_truth_df):
     # ground_truth_df Index(['Unnamed: 0', 'file name', 'rx', 'ry', 'rz', 'tx', 'ty', 'tz'], dtype='object')
@@ -117,9 +133,12 @@ def read_ground_truth_validation():
 def demo():
     preprocess_config()
     n_sub = opts.getint('general', 'nTotSub')
-    images_paths, images_points = create_paths()
 
     ground_truth = read_ground_truth_validation()
+    images_paths, images_points = create_paths(ground_truth)
+
+
+
 
     rvecs_per_image = np.zeros((len(images_paths), 3))
     for i, (path_to_image, path_to_points) in enumerate(zip(images_paths, images_points)):
