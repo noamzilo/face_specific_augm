@@ -84,8 +84,9 @@ def create_paths(ground_truth):
         path_to_images_folder = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\images"
         image_paths = []
         points_paths = []
-        for file_path in os.listdir(path_to_images_folder):
-            if file_path.endswith(".png") and file_path in tagged_images_names:
+        files_in_folder = os.listdir(path_to_images_folder)
+        for file_path in tagged_images_names:
+            if file_path.endswith(".png") and file_path in files_in_folder:
                 impath = os.path.join(path_to_images_folder, file_path)
                 ptspath = os.path.join(path_to_images_folder, file_path[:-4]+".pts")
                 if os.path.isfile(impath) and os.path.isfile(ptspath):
@@ -93,7 +94,8 @@ def create_paths(ground_truth):
                     points_paths.append(ptspath)
         print(f"#images: {len(image_paths)}")
 
-        return sorted(image_paths), sorted(points_paths)
+        return image_paths, points_paths
+        # return sorted(image_paths), sorted(points_paths)
 
 def compare_ground_truth_to_results(images_paths, rvecs_per_image, ground_truth_df):
     # ground_truth_df Index(['Unnamed: 0', 'file name', 'rx', 'ry', 'rz', 'tx', 'ty', 'tz'], dtype='object')
@@ -108,7 +110,7 @@ def compare_ground_truth_to_results(images_paths, rvecs_per_image, ground_truth_
         else:
             continue
     good_inds = np.array(good_inds)
-    calculated_images_names = [calculated_images_names[ind] for ind in good_inds]
+
     rvecs_per_image = rvecs_per_image[good_inds, :]
 
     truth_yaw_pitch_rolls = ground_truth_df[['rz', 'ry', 'rx']]
