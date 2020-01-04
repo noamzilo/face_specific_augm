@@ -95,7 +95,7 @@ def flipInCase(img, lmarks, allModels):
     yaws = []  # np.zeros(1,len(allModels))
     ## Getting yaw estimate over poses and subjects
     for mmm in allModels.values():
-        proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(mmm, lmarks[0])
+        proj_matrix, camera_matrix, rmat, tvec, rvecs = calib.estimate_camera(mmm, lmarks[0])
         yaws.append(calib.get_yaw(rmat))
     yaws = np.asarray(yaws)
     yaw = yaws.mean()
@@ -200,7 +200,7 @@ def decide_side_from_db(img, pose_Rt, allModels):
     # model3D = ThreeD_Model.FaceModel(this_path + "/models3d/" + pose_models[0] +'_01.mat', 'model3D')
     # Getting yaw estimate over poses and subjects
     mm = list(allModels.values())[0]
-    proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(mm, pose_Rt, pose_db_on=True)
+    proj_matrix, camera_matrix, rmat, tvec, rvecs = calib.estimate_camera(mm, pose_Rt, pose_db_on=True)
     yaw = calib.get_yaw(rmat)
     print('> Yaw value mean: ', yaw)
     return yaw

@@ -91,7 +91,7 @@ def demo():
                     eyemask = model3D.eyemask
 
                     # perform camera calibration according to the first face detected
-                    proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(model3D, land_marks[0])
+                    proj_matrix, camera_matrix, rmat, tvec, rvecs = calib.estimate_camera(model3D, land_marks[0])
 
                     # We use eyemask only for frontal
                     if not myutil.is_frontal(pose):

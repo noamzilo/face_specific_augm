@@ -174,7 +174,7 @@ def demo():
                         model3D = all_models[pose]
                         eye_mask = model3D.eyemask
                         # perform camera calibration according to the first face detected
-                        proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(model3D, landmarks[0])
+                        proj_matrix, camera_matrix, rmat, tvec, rvecs = calib.estimate_camera(model3D, landmarks[0])
                         yaw, pitch, roll = get_yaw_pitch_roll(rmat)
                         print(f"yaw = {yaw}, pitch={pitch}, roll={roll}")
                         yaw_pitch_rolls[i, :] = yaw, pitch, roll
