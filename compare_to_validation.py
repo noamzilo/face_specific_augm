@@ -79,9 +79,35 @@ def create_paths():
     return sorted(images_paths_with_points), sorted(points_paths_with_images)
 
 
+def compare_ground_truth_to_results(images_paths, calculated_yaw_pitch_rolls, ground_truth_df):
+    # ground_truth_df Index(['Unnamed: 0', 'file name', 'rx', 'ry', 'rz', 'tx', 'ty', 'tz'], dtype='object')
+    calculated_images_names = [os.path.basename(path) for path in images_paths]
+
+    truth_images_names = ground_truth_df[['file name']].values
+
+    good_inds = []
+    for i, image_name in enumerate(calculated_images_names):
+        if image_name in truth_images_names:
+            good_inds.append(i)
+        else:
+            continue
+    good_inds = np.array(good_inds)
+    calculated_images_names = [calculated_images_names[ind] for ind in good_inds]
+    calculated_yaw_pitch_rolls = calculated_yaw_pitch_rolls[good_inds, :]
+
+    truth_yaw_pitch_rolls = ground_truth_df[['rz', 'ry', 'rx']]
+
+    hi=5
+
+
 def read_ground_truth_validation():
     ground_truth_file_path = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\validation_set.csv"
-    ground_truth = pd.read_csv(ground_truth_file_path)
+    ground_truth = pd.read_csv(ground_truth_file_path,
+                               sep=r'\s*,\s*',
+                               header=0,
+                               encoding='ascii',
+                               engine='python')
+
     return ground_truth
 
 
@@ -94,6 +120,8 @@ def demo():
 
     yaw_pitch_rolls = np.zeros((len(images_paths), 3))
     for i, (path_to_image, path_to_points) in enumerate(zip(images_paths, images_points)):
+        # if i == 5: #TODO kill this NOAM
+        #     break
         # path_to_image = sys.argv
         file_list, output_folder = myutil.parse([sys.argv[0], path_to_image, path_to_points])
 
@@ -150,7 +178,7 @@ def demo():
                         yaw_pitch_rolls[i, :] = yaw, pitch, roll
     print(yaw_pitch_rolls)
 
-    # get ground truth results from validation file
+    compare_ground_truth_to_results(images_paths, yaw_pitch_rolls, ground_truth)
 
 
 if __name__ == "__main__":
