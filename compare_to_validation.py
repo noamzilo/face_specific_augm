@@ -14,7 +14,7 @@ import ThreeD_Model
 import config
 
 this_path = os.path.dirname(os.path.abspath(__file__))
-opts = config.parse()
+opts = config.parse_for_validation()
 
 # 3D Models we are gonna use to to the rendering {0, -40, -75}
 newModels = opts.getboolean('renderer', 'newRenderedViews')
