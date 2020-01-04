@@ -124,8 +124,6 @@ def demo():
 
     yaw_pitch_rolls = np.zeros((len(images_paths), 3))
     for i, (path_to_image, path_to_points) in enumerate(zip(images_paths, images_points)):
-        # if i == 5: #TODO kill this NOAM
-        #     break
         # path_to_image = sys.argv
         file_list, output_folder = myutil.parse([sys.argv[0], path_to_image, path_to_points])
 
