@@ -70,9 +70,44 @@ def get_yaw(rmat):
     out_yaw = angle_y
     out_roll = angle_z
 
-    #TODO NOAM: get roll pitch yaw from here
-
     return out_yaw
+
+
+def get_yaw_pitch_roll(rmat):
+    modelview = rmat
+    modelview = np.zeros( (3,4 ))
+    modelview[0:3,0:3] = rmat.transpose()
+    modelview = modelview.reshape(12)
+    # Code converted from function: getEulerFromRot()
+    angle_y = -math.asin( modelview[2] )  # Calculate Y-axis angle
+    C = math.cos( angle_y)
+    angle_y = math.degrees(angle_y)
+
+    if np.absolute(C) > 0.005: # Gimball lock?
+        trX = modelview[10] / C # No, so get X-axis angle
+        trY = -modelview[6] / C
+        angle_x = math.degrees( math.atan2( trY, trX ) )
+
+        trX = modelview[0] / C  # Get z-axis angle
+        trY = - modelview[1] / C
+        angle_z = math.degrees(  math.atan2( trY, trX) )
+    else:
+        # Gimball lock has occured
+        angle_x = 0
+        trX = modelview[5]
+        trY = modelview[4]
+        angle_z = math.degrees(  math.atan2( trY, trX) )
+
+    # Adjust to current mesh setting
+    angle_x = 180 - angle_x
+    angle_y = angle_y
+    angle_z = -angle_z
+
+    out_pitch = angle_x
+    out_yaw = angle_y
+    out_roll = angle_z
+
+    return out_yaw, out_pitch, out_roll
 
 
 def get_opengl_matrices(camera_matrix, rmat, tvec, width, height):

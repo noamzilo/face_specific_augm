@@ -12,34 +12,37 @@ import sys
 import myutil
 import ThreeD_Model
 import config
+from camera_calibration import get_yaw_pitch_roll
 
-this_path = os.path.dirname(os.path.abspath(__file__))
-opts = config.parse_for_validation()
 
-# 3D Models we are gonna use to to the rendering {0, -40, -75}
-newModels = opts.getboolean('renderer', 'newRenderedViews')
-pose_models_folder = '/model_lecturer/'
-if opts.getboolean('renderer', 'newRenderedViews'):
-    pose_models = ['model3D_aug_-00_00', ]
-else:
-    assert False
-    pose_models = ['model3D_aug_-00', 'model3D_aug_-40', 'model3D_aug_-75']
-
-# In case we want to crop the final image for each pose specified above/
-# Each bbox should be [tlx,tly,brx,bry]
-resizeCNN = opts.getboolean('general', 'resizeCNN')
-cnnSize = opts.getint('general', 'cnnSize')
-if not opts.getboolean('general', 'resnetON'):
-    crop_models = [None, None, None, None, None]  # <-- with this no crop is done.
-else:
-    # In case we want to produce images for ResNet
-    resizeCNN = False  # We can decide to resize it later using the CNN software or now here.
-    # The images produced without resizing could be useful to provide a reference system for in-plane alignment
-    cnnSize = 224
-    crop_models = [[23, 0, 23 + 125, 160], [0, 0, 210, 230], [0, 0, 210, 230]]  # <-- best crop for ResNet
+def preprocess_config():
+    global this_path, opts, pose_models_folder, pose_models
+    this_path = os.path.dirname(os.path.abspath(__file__))
+    opts = config.parse_for_validation()
+    # 3D Models we are gonna use to to the rendering {0, -40, -75}
+    newModels = opts.getboolean('renderer', 'newRenderedViews')
+    pose_models_folder = '/model_lecturer/'
+    if opts.getboolean('renderer', 'newRenderedViews'):
+        pose_models = ['model3D_aug_-00_00', ]
+    else:
+        assert False
+        pose_models = ['model3D_aug_-00', 'model3D_aug_-40', 'model3D_aug_-75']
+    # In case we want to crop the final image for each pose specified above/
+    # Each bbox should be [tlx,tly,brx,bry]
+    resizeCNN = opts.getboolean('general', 'resizeCNN')
+    cnnSize = opts.getint('general', 'cnnSize')
+    if not opts.getboolean('general', 'resnetON'):
+        crop_models = [None, None, None, None, None]  # <-- with this no crop is done.
+    else:
+        # In case we want to produce images for ResNet
+        resizeCNN = False  # We can decide to resize it later using the CNN software or now here.
+        # The images produced without resizing could be useful to provide a reference system for in-plane alignment
+        cnnSize = 224
+        crop_models = [[23, 0, 23 + 125, 160], [0, 0, 210, 230], [0, 0, 210, 230]]  # <-- best crop for ResNet
 
 
 def demo():
+    preprocess_config()
     n_sub = opts.getint('general', 'nTotSub')
     file_list, output_folder = myutil.parse(sys.argv)
 
@@ -73,7 +76,7 @@ def demo():
             # To refine the estimation of yaw. Yaw can change from model to model...
 
             img_display = img.copy()
-            img, landmarks, yaw = myutil.flipInCase(img, landmarks, all_models)
+            img, landmarks, img_yaw = myutil.flipInCase(img, landmarks, all_models)
             # listPose = myutil.decidePose(yaw, opts, newModels)
             list_pose = [0]
             # Looping over the poses
@@ -91,6 +94,8 @@ def demo():
                     eye_mask = model3D.eyemask
                     # perform camera calibration according to the first face detected
                     proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(model3D, landmarks[0])
+                    yaw, pitch, roll = get_yaw_pitch_roll(rmat)
+                    print(f"yaw = {yaw}, pitch={pitch}, roll={roll}")
 
 
 if __name__ == "__main__":
