@@ -79,7 +79,7 @@ def create_paths():
     return sorted(images_paths_with_points), sorted(points_paths_with_images)
 
 
-def compare_ground_truth_to_results(images_paths, calculated_yaw_pitch_rolls, ground_truth_df):
+def compare_ground_truth_to_results(images_paths, rvecs_per_image, ground_truth_df):
     # ground_truth_df Index(['Unnamed: 0', 'file name', 'rx', 'ry', 'rz', 'tx', 'ty', 'tz'], dtype='object')
     calculated_images_names = [os.path.basename(path) for path in images_paths]
 
@@ -93,12 +93,12 @@ def compare_ground_truth_to_results(images_paths, calculated_yaw_pitch_rolls, gr
             continue
     good_inds = np.array(good_inds)
     calculated_images_names = [calculated_images_names[ind] for ind in good_inds]
-    calculated_yaw_pitch_rolls = calculated_yaw_pitch_rolls[good_inds, :]
+    rvecs_per_image = rvecs_per_image[good_inds, :]
 
     truth_yaw_pitch_rolls = ground_truth_df[['rz', 'ry', 'rx']]
 
 
-    diff = calculated_yaw_pitch_rolls - truth_yaw_pitch_rolls
+    diff = rvecs_per_image - truth_yaw_pitch_rolls
 
     hi=5
 
@@ -121,7 +121,7 @@ def demo():
 
     ground_truth = read_ground_truth_validation()
 
-    yaw_pitch_rolls = np.zeros((len(images_paths), 3))
+    rvecs_per_image = np.zeros((len(images_paths), 3))
     for i, (path_to_image, path_to_points) in enumerate(zip(images_paths, images_points)):
         # path_to_image = sys.argv
         file_list, output_folder = myutil.parse([sys.argv[0], path_to_image, path_to_points])
@@ -178,10 +178,10 @@ def demo():
                         print(f"yaw = {yaw}, pitch={pitch}, roll={roll}")
                         print(f"rx = {rvecs[0]}, ry={rvecs[1]}, rz={rvecs[2]}")
                         # yaw_pitch_rolls[i, :] = yaw, pitch, roll
-                        yaw_pitch_rolls[i, :] = rvecs[:, 0]
-    print(yaw_pitch_rolls)
+                        rvecs_per_image[i, :] = rvecs[:, 0]
+    print(rvecs_per_image)
 
-    compare_ground_truth_to_results(images_paths, yaw_pitch_rolls, ground_truth)
+    compare_ground_truth_to_results(images_paths, rvecs_per_image, ground_truth)
 
 
 if __name__ == "__main__":
