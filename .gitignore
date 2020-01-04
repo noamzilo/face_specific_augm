@@ -1,3 +1,7 @@
 /.idea/
 /venv/*
 *.pyc
+/output/
+/dlib_models/shape_predictor_68_face_landmarks.dat
+/dlib_models/shape_predictor_68_face_landmarks.dat.bz2
+/model_lecturer/model3D_aug_-00_00_01.mat
