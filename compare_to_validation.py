@@ -41,10 +41,48 @@ def preprocess_config():
         crop_models = [[23, 0, 23 + 125, 160], [0, 0, 210, 230], [0, 0, 210, 230]]  # <-- best crop for ResNet
 
 
+def create_paths():
+    path_to_images_folder = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\images"
+    image_paths = []
+    for file_path in os.listdir(path_to_images_folder):
+        if file_path.endswith(".png"):
+            image_paths.append(os.path.join(path_to_images_folder, file_path))
+    print(f"#images: {len(image_paths)}")
+
+    points_paths = []
+    for file_path in os.listdir(path_to_images_folder):
+        if file_path.endswith(".pts"):
+            points_paths .append(os.path.join(path_to_images_folder, file_path))
+    print(f"#points: {len(points_paths )}")
+
+    # cull images that don't have points
+    images_paths_with_points = []
+    for image_path in image_paths:
+        for points_path in points_paths:
+            if image_path.split(".png")[0] == points_path.split(".pts")[0]:
+                images_paths_with_points.append(image_path)
+                break
+
+    # cull pointa that don't have images
+    points_paths_with_images = []
+    for points_path in points_paths:
+        for image_path in image_paths:
+            if image_path.split(".png")[0] != points_path.split(".pts")[0]:
+                points_paths_with_images.append(points_path)
+                break
+
+    assert len(images_paths_with_points) == len(points_paths_with_images)
+    print(f"#tagged images = {len(images_paths_with_points)}")
+
+    return sorted(images_paths_with_points), sorted(points_paths_with_images)
+
+
 def demo():
     preprocess_config()
     n_sub = opts.getint('general', 'nTotSub')
-    file_list, output_folder = myutil.parse(sys.argv)
+    paths = create_paths()
+    path_to_image = sys.argv
+    file_list, output_folder = myutil.parse(path_to_image)
 
     # check for dlib saved weights for face landmark detection
     # if it fails, dowload and extract it manually from
