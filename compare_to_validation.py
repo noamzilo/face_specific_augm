@@ -13,6 +13,8 @@ import myutil
 import ThreeD_Model
 import config
 from camera_calibration import get_yaw_pitch_roll
+from pyntcloud import PyntCloud
+import pandas as pd
 
 
 def preprocess_config():
@@ -77,11 +79,21 @@ def create_paths():
     return sorted(images_paths_with_points), sorted(points_paths_with_images)
 
 
+def read_ground_truth_validation():
+    ground_truth_file_path = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\validation_set.csv"
+    ground_truth = pd.read_csv(ground_truth_file_path)
+    return ground_truth
+
+
 def demo():
     preprocess_config()
     n_sub = opts.getint('general', 'nTotSub')
     images_paths, images_points = create_paths()
-    for path_to_image, path_to_points in zip(images_paths, images_points):
+
+    ground_truth = read_ground_truth_validation()
+
+    yaw_pitch_rolls = np.zeros((len(images_paths), 3))
+    for i, (path_to_image, path_to_points) in enumerate(zip(images_paths, images_points)):
         # path_to_image = sys.argv
         file_list, output_folder = myutil.parse([sys.argv[0], path_to_image, path_to_points])
 
@@ -99,10 +111,11 @@ def demo():
             splitted = f.split(',')
             image_key = splitted[0]
             image_path = splitted[1]
-            image_landmarks = splitted[2]
+            image_landmarks_path = splitted[2]
             img = cv2.imread(image_path, 1)
-            if image_landmarks != "None":
-                landmark = np.loadtxt(image_landmarks)
+            if image_landmarks_path != "None":
+                # landmark = np.loadtxt(image_landmarks_path)
+                landmark = np.loadtxt(image_landmarks_path, comments=("version:", "n_points:", "{", "}"))
                 landmarks = list()
                 landmarks.append(landmark)
             else:
@@ -118,8 +131,7 @@ def demo():
                 img, landmarks, img_yaw = myutil.flipInCase(img, landmarks, all_models)
                 # listPose = myutil.decidePose(yaw, opts, new_models)
                 list_pose = [0]
-                # Looping over the poses
-                # for poseId in listPose:
+
                 for poseId in list_pose:
                     posee = pose_models[poseId]
                     # Looping over the subjects
@@ -135,6 +147,10 @@ def demo():
                         proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(model3D, landmarks[0])
                         yaw, pitch, roll = get_yaw_pitch_roll(rmat)
                         print(f"yaw = {yaw}, pitch={pitch}, roll={roll}")
+                        yaw_pitch_rolls[i, :] = yaw, pitch, roll
+    print(yaw_pitch_rolls)
+
+    # get ground truth results from validation file
 
 
 if __name__ == "__main__":
