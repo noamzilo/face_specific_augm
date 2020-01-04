@@ -18,15 +18,14 @@ opts = config.parse()
 
 # 3D Models we are gonna use to to the rendering {0, -40, -75}
 newModels = opts.getboolean('renderer', 'newRenderedViews')
+pose_models_folder = '/model_lecturer/'
 if opts.getboolean('renderer', 'newRenderedViews'):
-    pose_models_folder = '/models3d_new/'
     pose_models = ['model3D_aug_-00_00',
                    'model3D_aug_-22_00',
                    'model3D_aug_-40_00',
                    'model3D_aug_-55_00',
                    'model3D_aug_-75_00']
 else:
-    pose_models_folder = '/models3d/'
     pose_models = ['model3D_aug_-00', 'model3D_aug_-40', 'model3D_aug_-75']
 
 # In case we want to crop the final image for each pose specified above/
@@ -93,3 +92,7 @@ def demo():
                     eye_mask = model3D.eyemask
                     # perform camera calibration according to the first face detected
                     proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(model3D, landmarks[0])
+
+
+if __name__ == "__main__":
+    demo()
