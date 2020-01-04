@@ -7,13 +7,13 @@ import math
 
 def estimate_camera(model3D, fidu_XY, pose_db_on=False):
     if pose_db_on:
-        rmat, tvec = calib_camera(model3D, fidu_XY, pose_db_on=True)
+        rmat, tvec, rvecs = calib_camera(model3D, fidu_XY, pose_db_on=True)
         tvec = tvec.reshape(3,1)
     else:
-        rmat, tvec = calib_camera(model3D, fidu_XY)
+        rmat, tvec, rvecs = calib_camera(model3D, fidu_XY)
     RT = np.hstack((rmat, tvec))
     projection_matrix = model3D.out_A * RT
-    return projection_matrix, model3D.out_A, rmat, tvec
+    return projection_matrix, model3D.out_A, rmat, tvec, rvecs
 
 def calib_camera(model3D, fidu_XY, pose_db_on=False):
     #compute pose using refrence 3D points + query 2D point
@@ -34,7 +34,7 @@ def calib_camera(model3D, fidu_XY, pose_db_on=False):
         t = np.pi
         RRz180 = np.asmatrix([np.cos(t), -np.sin(t), 0, np.sin(t), np.cos(t), 0, 0, 0, 1]).reshape((3, 3))
         rmat = RRz180*rmat
-    return rmat, tvec
+    return rmat, tvec, rvecs
 
 def get_yaw(rmat):
     modelview = rmat
