@@ -20,12 +20,9 @@ opts = config.parse_for_validation()
 newModels = opts.getboolean('renderer', 'newRenderedViews')
 pose_models_folder = '/model_lecturer/'
 if opts.getboolean('renderer', 'newRenderedViews'):
-    pose_models = ['model3D_aug_-00_00',
-                   'model3D_aug_-22_00',
-                   'model3D_aug_-40_00',
-                   'model3D_aug_-55_00',
-                   'model3D_aug_-75_00']
+    pose_models = ['model3D_aug_-00_00', ]
 else:
+    assert False
     pose_models = ['model3D_aug_-00', 'model3D_aug_-40', 'model3D_aug_-75']
 
 # In case we want to crop the final image for each pose specified above/
@@ -77,9 +74,11 @@ def demo():
 
             img_display = img.copy()
             img, landmarks, yaw = myutil.flipInCase(img, landmarks, all_models)
-            listPose = myutil.decidePose(yaw, opts, newModels)
+            # listPose = myutil.decidePose(yaw, opts, newModels)
+            list_pose = [0]
             # Looping over the poses
-            for poseId in listPose:
+            # for poseId in listPose:
+            for poseId in list_pose:
                 posee = pose_models[poseId]
                 # Looping over the subjects
                 for subj in range(1, n_sub + 1):
