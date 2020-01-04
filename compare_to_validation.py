@@ -177,7 +177,9 @@ def demo():
                         proj_matrix, camera_matrix, rmat, tvec, rvecs = calib.estimate_camera(model3D, landmarks[0])
                         yaw, pitch, roll = get_yaw_pitch_roll(rmat)
                         print(f"yaw = {yaw}, pitch={pitch}, roll={roll}")
-                        yaw_pitch_rolls[i, :] = yaw, pitch, roll
+                        print(f"rx = {rvecs[0]}, ry={rvecs[1]}, rz={rvecs[2]}")
+                        # yaw_pitch_rolls[i, :] = yaw, pitch, roll
+                        yaw_pitch_rolls[i, :] = rvecs[:, 0]
     print(yaw_pitch_rolls)
 
     compare_ground_truth_to_results(images_paths, yaw_pitch_rolls, ground_truth)
