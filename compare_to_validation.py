@@ -96,7 +96,11 @@ def compare_ground_truth_to_results(images_paths, calculated_yaw_pitch_rolls, gr
     calculated_yaw_pitch_rolls = calculated_yaw_pitch_rolls[good_inds, :]
 
     truth_yaw_pitch_rolls = ground_truth_df[['rz', 'ry', 'rx']]
+    compare_truth_to = np.deg2rad(calculated_yaw_pitch_rolls)
 
+    diff = compare_truth_to - truth_yaw_pitch_rolls
+    # np.testing.assert_almost_equal(compare_truth_to, truth_yaw_pitch_rolls)
+    diff2 = calculated_yaw_pitch_rolls - np.rad2deg(truth_yaw_pitch_rolls)
     hi=5
 
 
