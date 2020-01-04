@@ -22,23 +22,23 @@ def mymkdir(output):
 
 
 def parse(argv):
-    fileList = []
-    outputFolder = 'output/'
-    ## Case in which only an image is provided
+    file_list = []
+    output_folder = 'output/'
+    # Case in which only an image is provided
     if len(argv) == 2:
         head, tail = os.path.split(argv[1])
-        fileList = [tail.split('.')[0] + ',' + str(argv[1]) + ',None']
-    ## Ok landmarks are provided as well or we are in batch mode
+        file_list = [tail.split('.')[0] + ',' + str(argv[1]) + ',None']
+    # Ok landmarks are provided as well or we are in batch mode
     elif len(argv) == 3:
         # print argv[1]
-        ## If we are not in batch mode
+        # If we are not in batch mode
         if "--batch" not in str(argv[1]):
             head, tail = os.path.split(argv[1])
-            fileList = [tail.split('.')[0] + ',' + str(argv[1]) + ',' + str(argv[2])]
+            file_list = [tail.split('.')[0] + ',' + str(argv[1]) + ',' + str(argv[2])]
         else:
             print('> Batch mode detected - reading from file: ' + str(argv[2]))
             filep = str(argv[2])
-            fileList = [line.strip() for line in open(filep)]
+            file_list = [line.strip() for line in open(filep)]
     else:
         print('Usage for face rendering. See below')
         print('Usage: python demo.py <image-path>')
@@ -47,10 +47,10 @@ def parse(argv):
         print('where <file-list-path> is a csv file where each line has')
         print('image_key,<image-path>,<landmark-path> (lines that contain # are skipped)')
         exit(1)
-    return fileList, outputFolder
+    return file_list, output_folder
 
 
-def isFrontal(pose):
+def is_frontal(pose):
     if '_-00_' in pose:
         return True
     return False
@@ -168,8 +168,8 @@ def show(img_display, img, lmarks, frontal_raw, \
 # 	else:
 # 		return [0,1,2]
 
-def decidePose(yaw, opts, newModels=True):
-    if newModels == True:
+def decide_pose(yaw, opts, new_models=True):
+    if new_models:
         if opts.getboolean('renderer', 'nearView'):
             yaw = abs(yaw)
             # If yaw is near-frontal we render everything
@@ -195,10 +195,10 @@ def decidePose(yaw, opts, newModels=True):
             return [0, 1, 2]
 
 
-def decideSide_from_db(img, pose_Rt, allModels):
-    ## Check if we need to flip the image
+def decide_side_from_db(img, pose_Rt, allModels):
+    # Check if we need to flip the image
     # model3D = ThreeD_Model.FaceModel(this_path + "/models3d/" + pose_models[0] +'_01.mat', 'model3D')
-    ## Getting yaw estimate over poses and subjects
+    # Getting yaw estimate over poses and subjects
     mm = list(allModels.values())[0]
     proj_matrix, camera_matrix, rmat, tvec = calib.estimate_camera(mm, pose_Rt, pose_db_on=True)
     yaw = calib.get_yaw(rmat)
