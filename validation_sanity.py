@@ -3,6 +3,7 @@ import numpy as np
 import os
 import dlib
 import ThreeD_Model
+import cv2
 
 
 def preload(this_path, pose_models_folder, pose_models, nSub):
@@ -45,6 +46,27 @@ def load_landmarks_from_path(dir_path, file_name):
     return points
 
 
+def shape_to_np(shape, dtype="int"):
+    # initialize the list of (x, y)-coordinates
+    coords = np.zeros((68, 2), dtype=dtype)
+
+    # loop over the 68 facial landmarks and convert them
+    # to a 2-tuple of (x, y)-coordinates
+    for i in range(0, 68):
+        coords[i] = (shape.part(i).x, shape.part(i).y)
+
+    # return the list of (x, y)-coordinates
+    return coords
+
+def compare_result_to_ground(validation_df, results_list):
+    ground_rx_ry_rz = np.array(validation_df[['rx', 'ry', 'rz']])
+    results_rx_ry_rz = [r[0:3] for r in results_list]
+    results_rx_ry_rz = np.array(results_rx_ry_rz)
+
+    hi=5
+
+
+
 if __name__ == "__main__":
     def main():
         validation_df = read_ground_truth_validation()
@@ -52,7 +74,9 @@ if __name__ == "__main__":
         validation_pts_filenames = [filename.replace('.png', '.pts') for filename in validation_images_filenames]
 
         validation_images_folder_path = r"C:\Noam\Code\vision_course\face_pose_estimation\images\valid_set\images"
+        validation_image_paths = [os.path.join(validation_images_folder_path, image_file_name) for image_file_name in validation_images_filenames]
         validation_points = [load_landmarks_from_path(validation_images_folder_path, file_name) for file_name in validation_pts_filenames]
+
 
         # initialize dlib's face detector and create facial landmark predictor
         detector = dlib.get_frontal_face_detector()
@@ -60,7 +84,7 @@ if __name__ == "__main__":
         assert os.path.isfile(predictor_path)
         predictor = dlib.shape_predictor(predictor_path)
 
-        result = []
+        results_list = []
         this_path = r"C:\\Noam\\Code\\vision_course\\face_specific_augm"
         pose_models_folder = r'/model_lecturer/'
         pose_models = [r'model3D_aug_-00_00']
@@ -68,8 +92,38 @@ if __name__ == "__main__":
         pose = r'model3D_aug_-00_00_01.mat'
         model3d = preload(this_path, pose_models_folder, pose_models, n_sub)[pose]
 
+        for i, image_path in enumerate(validation_image_paths):
+            image = cv2.imread(image_path)
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+            rects = detector(gray, 1)
 
+            # for i, rect in enumerate(rects):
+            #     # determine thefacial landmarks for the face region then convert the landmarks to x,y np array
+            #     shape = predictor(gray, rect)
+            #     shape = shape_to_np(shape)
+            #
+            #     success, rotation_vec, translation_vec = cv2.solvePnP(model3d.model_TD,
+            #                                                           validation_points[i],
+            #                                                           model3d.out_A,
+            #                                                           None,
+            #                                                           None,
+            #                                                           None,
+            #                                                           False)
+            #
+            #     results_list.append(np.append(rotation_vec, translation_vec))
+
+            success, rotation_vec, translation_vec = cv2.solvePnP(model3d.model_TD,
+                                                                  validation_points[i],
+                                                                  model3d.out_A,
+                                                                  None,
+                                                                  None,
+                                                                  None,
+                                                                  False)
+
+            results_list.append(np.append(rotation_vec, translation_vec))
+
+        compare_result_to_ground(validation_df, results_list)
 
         hi = 5
 
