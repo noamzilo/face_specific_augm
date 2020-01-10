@@ -62,8 +62,9 @@ def compare_result_to_ground(validation_df, results_list):
     ground_rx_ry_rz = np.array(validation_df[['rx', 'ry', 'rz']])
     results_rx_ry_rz = [r[0:3] for r in results_list]
     results_rx_ry_rz = np.array(results_rx_ry_rz)
+    pic_names = validation_df['file name'].values
 
-    hi=5
+    np.testing.assert_almost_equal(ground_rx_ry_rz, results_rx_ry_rz)
 
 
 
